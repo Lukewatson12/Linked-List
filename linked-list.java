@@ -6,16 +6,18 @@ class Entry {
         linkedList.pushNode(new Node(9));
         linkedList.pushNode(new Node(7));
 
-//        Node node = linkedList.getNodeByValue(3);
-        Node node = linkedList.getNodeByValue(12);
+        Node node = linkedList.getNodeByValue(3);
 
-        System.out.println(node);
+        linkedList.deleteNode(7);
+
+        linkedList.getNodeByValue(7);
     }
 }
 
 class LinkedList {
 
     private Node headNode;
+    private Node tailNode;
 
     LinkedList() {
         this.headNode = null;
@@ -23,6 +25,50 @@ class LinkedList {
 
     public Node getHeadNode() {
         return headNode;
+    }
+
+    public Node getTailNode() {
+        return tailNode;
+    }
+
+    public void pushNode(Node nextNode) {
+        if (tailNode == null) {
+            tailNode = nextNode;
+        }
+
+        if (this.headNode != null) {
+            this.headNode.setPreviousNode(nextNode);
+        }
+
+
+        nextNode.setNextNode(this.headNode);
+        headNode = nextNode;
+    }
+
+    public void deleteNode(int nodeValue) throws Exception {
+        Node node = getNodeByValue(nodeValue);
+
+        resetNodeRelations(node);
+
+        if(node == getTailNode()) {
+            tailNode = node.getPreviousNode();
+        } else if (node == getHeadNode()) {
+            headNode = node.getNextNode();
+        }
+    }
+
+    private void resetNodeRelations(Node node) {
+        if (node.hasNextNode() && node.hasPreviousNode()) {
+            Node nextNode = node.getNextNode();
+            Node previousNode = node.getPreviousNode();
+
+            nextNode.setPreviousNode(previousNode);
+            previousNode.setNextNode(nextNode);
+        } else if (node.hasPreviousNode() && !node.hasNextNode()) {
+            node.getPreviousNode().setNextNode(null);
+        } else {
+            node.getNextNode().setPreviousNode(null);
+        }
     }
 
     public Node getNodeByValue(int value) throws Exception {
@@ -44,16 +90,12 @@ class LinkedList {
         throw new Exception("Node not found");
     }
 
-    public void pushNode(Node nextNode) {
-        nextNode.setNextNode(this.headNode);
-        headNode = nextNode;
-    }
-
 }
 
 class Node {
     private int value;
     private Node nextNode;
+    private Node previousNode;
 
     Node(int value) {
         this.value = value;
@@ -67,11 +109,23 @@ class Node {
         return nextNode;
     }
 
+    public Node getPreviousNode() {
+        return previousNode;
+    }
+
     public boolean hasNextNode() {
-        return this.nextNode.nextNode != null;
+        return this.nextNode != null;
+    }
+
+    public boolean hasPreviousNode() {
+        return this.previousNode != null;
     }
 
     public void setNextNode(Node nextNode) {
         this.nextNode = nextNode;
+    }
+
+    public void setPreviousNode(Node previousNode) {
+        this.previousNode = previousNode;
     }
 }
